@@ -1,0 +1,18 @@
+
+color: "Blue"
+title: "Template"
+url: "Link"
+author:
+  name: "Some Name"
+  iconUrl: "link"
+  url: "Link"
+description: "Some description here"
+thumbnail: "link"
+fields: 
+  - { name: "Inline field title", value: "Some value here", inline: false }
+  - { name: "Inline field title", value: "Some value here", inline: false }
+image: "link"
+timestamp: true
+footer:
+  text: "Some Text"
+  iconURL: "link"
