@@ -4,12 +4,13 @@
   "description": "Pokemon TCG Discord Bot",
   "main": "src/index.js",
   "scripts": {
-    "start": "bun ./src/index.js"
+    "start": "bun ./src/index.js",
+    "test": "bun ./src/test.js"
   },
   "author": "Sir Blob",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.7.7",
+    "@bosstop/pokemontcgapi": "^1.0.3",
     "discord.js": "^14.16.3",
     "dotenv": "^16.4.5",
     "js-yaml": "^4.1.0",

@@ -2,6 +2,9 @@ import Discord from "discord.js";
 import fs from "fs";
 import path from "path";
 import BotClient from "./libs/BotClient.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const client = new BotClient({ 
     partials: [Discord.Partials.Message, Discord.Partials.Channel, Discord.Partials.Reaction],
