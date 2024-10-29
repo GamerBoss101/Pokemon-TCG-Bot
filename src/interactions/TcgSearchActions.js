@@ -2,7 +2,7 @@ import BotAction from "../libs/BotAction";
 
 export default class TCGSearch extends BotAction {
     constructor() {
-        super("btn-tcg");
+        super("btn-tcg-card");
     }
 
     getIndex(cardID, cards) {
@@ -16,6 +16,11 @@ export default class TCGSearch extends BotAction {
 
     async nextBtn(Discord, client, interaction) {
         let cards = client.commandInfo.get(interaction.message.interaction.id);
+        if (!cards) {
+            interaction.message.edit({ content: "This message is now expired.", components: [] });
+            return;
+        }
+
         let cardID = interaction.message.embeds[0].footer.text;
         let index = this.getIndex(cardID, cards);
 
@@ -28,6 +33,11 @@ export default class TCGSearch extends BotAction {
                 .setLabel('Previous')
                 .setStyle(Discord.ButtonStyle.Danger)
                 .setDisabled(index-- == 0),
+            new Discord.ButtonBuilder()
+                .setCustomId('btn-tcg-info')
+                .setLabel('Info')
+                .setStyle(Discord.ButtonStyle.Primary)
+                .setDisabled(false),
             new Discord.ButtonBuilder()
                 .setCustomId('btn-tcg-next')
                 .setLabel('Next')
@@ -42,8 +52,32 @@ export default class TCGSearch extends BotAction {
         });
     }
 
+    async infoBtn(Discord, client, interaction) {
+        let cards = client.commandInfo.get(interaction.message.interaction.id);
+        if (!cards) {
+            interaction.message.edit({ content: "This message is now expired.", components: [] });
+            return;
+        }
+
+        let cardID = interaction.message.embeds[0].footer.text;
+        let index = this.getIndex(cardID, cards);
+
+        let card = cards[index];
+
+        let embed = client.util.buildEmbed(client.formatter.format("./responses/tcg/cardinfo.yaml", card));
+
+        interaction.message.edit({ embeds: [embed] }).then(async(msg) => {
+            interaction.deleteReply();
+        });
+    }
+
     async prevBtn(Discord, client, interaction) {
         let cards = client.commandInfo.get(interaction.message.interaction.id);
+        if (!cards) {
+            interaction.message.edit({ content: "This message is now expired.", components: [] });
+            return;
+        }
+        
         let cardID = interaction.message.embeds[0].footer.text;
         let index = this.getIndex(cardID, cards);
 
@@ -73,7 +107,7 @@ export default class TCGSearch extends BotAction {
     async execute(Discord, client, interaction) {
         await interaction.reply({ content: "⏳ One Moment Please. . . ", ephemeral: true });
 
-        let action = interaction.customId.split("-")[2];
+        let action = interaction.customId.split("-")[3];
 
         switch (action) {
             case "next":
@@ -81,6 +115,9 @@ export default class TCGSearch extends BotAction {
                 break;
             case "prev":
                 this.prevBtn(Discord, client, interaction);
+                break;
+            case "info":
+                this.infoBtn(Discord, client, interaction);
                 break;
             default:
                 break;

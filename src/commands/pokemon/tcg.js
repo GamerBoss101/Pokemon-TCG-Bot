@@ -41,6 +41,24 @@ export default class StatusCommand extends BotCommand {
                         .setRequired(true)
                 )
         );
+
+        this.data.addSubcommand(subcommand =>
+            subcommand
+                .setName("listsets")
+                .setDescription("List all Pokemon TCG sets")
+        );
+
+        this.data.addSubcommand(subcommand =>
+            subcommand
+                .setName("set")
+                .setDescription("Get a Pokemon TCG set")
+                .addStringOption(option =>
+                    option
+                        .setName("name")
+                        .setDescription("The name of the set")
+                        .setRequired(true)
+                )
+        );
     }
 
     async searchCard(Discord, client, interaction) {
@@ -59,12 +77,17 @@ export default class StatusCommand extends BotCommand {
         const row = new Discord.ActionRowBuilder()
         .addComponents(
             new Discord.ButtonBuilder()
-                .setCustomId('btn-tcg-prev')
+                .setCustomId('btn-tcg-card-prev')
                 .setLabel('Previous')
                 .setStyle(Discord.ButtonStyle.Danger)
                 .setDisabled(true),
             new Discord.ButtonBuilder()
-                .setCustomId('btn-tcg-next')
+                .setCustomId('btn-tcg-card-info')
+                .setLabel('Info')
+                .setStyle(Discord.ButtonStyle.Primary)
+                .setDisabled(false),
+            new Discord.ButtonBuilder()
+                .setCustomId('btn-tcg-card-next')
                 .setLabel('Next')
                 .setStyle(Discord.ButtonStyle.Success)
                 .setDisabled(false)
@@ -78,7 +101,7 @@ export default class StatusCommand extends BotCommand {
             setTimeout(async() => {
                 await interaction.editReply({ content: "This message is now expired.", components: [] });
                 client.commandInfo.delete(msg.id);
-            }, ms("20s"));
+            }, ms("1m"));
         });
     }
 
@@ -89,7 +112,67 @@ export default class StatusCommand extends BotCommand {
 
         if(!card) return interaction.reply({ content: "No card found", ephemeral: true });
 
-        let embed = client.util.buildEmbed(client.formatter.format("./responses/tcg/cardview.yaml", card));
+        let embed = client.util.buildEmbed(client.formatter.format("./responses/tcg/cardinfo.yaml", card));
+
+        interaction.reply({ embeds: [embed] });
+    }
+
+    async listSets(Discord, client, interaction) {
+        let sets = await client.tcg.sets.all();
+
+        if(sets.length === 0) return interaction.reply({ content: "No sets found", ephemeral: true });
+
+        let setFields = sets.reverse().map(set => {
+            return {
+                name: set.name,
+                value: set.releaseDate,
+                inline: true
+            }
+        });
+
+        setFields = setFields.slice(0, 12);
+
+        const row = new Discord.ActionRowBuilder()
+        .addComponents(
+            new Discord.ButtonBuilder()
+                .setCustomId('btn-tcg-set-prev')
+                .setLabel('Previous')
+                .setStyle(Discord.ButtonStyle.Danger)
+                .setDisabled(true),
+            new Discord.ButtonBuilder()
+                .setCustomId('btn-tcg-set-next')
+                .setLabel('Next')
+                .setStyle(Discord.ButtonStyle.Success)
+                .setDisabled(false)
+        );
+
+        let embed = new Discord.EmbedBuilder()
+        .setTitle("Pokemon TCG Sets")
+        .setColor("Random")
+        .addFields(setFields)
+        .setFooter({ text: "12" })
+        .setTimestamp();
+
+        interaction.reply({ embeds: [embed], components: [row] }).then((msg) => {
+            client.commandInfo.set(msg.id, sets);
+
+            setTimeout(async() => {
+                await interaction.editReply({ content: "This message is now expired.", components: [] });
+                client.commandInfo.delete(msg.id);
+            }, ms("1m"));
+        });
+    }
+
+    async getSet(Discord, client, interaction) {
+        let name = interaction.options.getString("name");
+
+        let set = await client.tcg.sets.getSetByName(name);
+
+        if(!set) return interaction.reply({ content: "No set found", ephemeral: true });
+
+        console.log(set);
+
+        let embed = client.util.buildEmbed(client.formatter.format("./responses/tcg/setinfo.yaml", set));
 
         interaction.reply({ embeds: [embed] });
     }
@@ -103,6 +186,12 @@ export default class StatusCommand extends BotCommand {
                 break;
             case "card":
                 this.getCard(Discord, client, interaction);
+                break;
+            case "listsets":
+                this.listSets(Discord, client, interaction);
+                break;
+            case "set":
+                this.getSet(Discord, client, interaction);
                 break;
             default:
                 interaction.reply({ content: "Invalid subcommand", ephemeral: true });

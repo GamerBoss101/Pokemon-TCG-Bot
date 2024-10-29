@@ -1,5 +1,5 @@
 
 color: "Blue"
-image: "{images_large}"
+title: "{name}"
 footer:
   text: "{id}"

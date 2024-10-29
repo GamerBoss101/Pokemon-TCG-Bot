@@ -10,7 +10,7 @@
   "author": "Sir Blob",
   "license": "ISC",
   "dependencies": {
-    "@bosstop/pokemontcgapi": "^1.0.3",
+    "@bosstop/pokemontcgapi": "^1.0.4",
     "discord.js": "^14.16.3",
     "dotenv": "^16.4.5",
     "js-yaml": "^4.1.0",

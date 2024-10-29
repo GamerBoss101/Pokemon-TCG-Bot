@@ -1,0 +1,17 @@
+
+color: "Blue"
+title: "{name}"
+fields: 
+  - { name: "Set", value: "{set_name}", inline: true }
+  - { name: "Series", value: "{set_series}", inline: true }
+  - { name: "Rarety", value: "{rarity}", inline: true }
+  - { name: "Market Price", value: "[$ {tcgplayer_prices_holofoil_market} ]( {tcgplayer_url} )", inline: false }
+  - { name: "Low Price", value: "[$ {tcgplayer_prices_holofoil_low} ]( {tcgplayer_url} )", inline: true }
+  - { name: "Mid Price", value: "[$ {tcgplayer_prices_holofoil_mid} ]( {tcgplayer_url} )", inline: true }
+  - { name: "High Price", value: "[$ {tcgplayer_prices_holofoil_high} ]( {tcgplayer_url} )", inline: true }
+  - { name: "TCG Standard", value: "{legalities_standard}", inline: true }
+  - { name: "TCG Expanded", value: "{legalities_expanded}", inline: true }
+  - { name: "TCG Unlimited", value: "{legalities_unlimited}", inline: true }
+image: "{images_large}"
+footer:
+  text: "{id}"
